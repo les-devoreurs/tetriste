@@ -11,4 +11,4 @@ Genérer le makefile avec Cmake :
 cmake .
 
 Lancer le makefile : 
-makefile
+make
