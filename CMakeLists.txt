@@ -12,9 +12,7 @@ add_executable(${PROJECT_NAME} "")
 target_sources(${PROJECT_NAME} PUBLIC arkanoid.c)
 target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${SDL2_LIBRARIES})
-
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/sprites.bmp
-	DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)	
+	
 
 IF (MSVC)
 	file(COPY ${SDL2_LIBDIR}/SDL2.dll
