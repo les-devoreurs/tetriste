@@ -1,0 +1,62 @@
+#include <SDL_stdinc.h>
+
+#include "game.h"
+#include "tetromino.h"
+#include "renderer.h"
+
+void init_game(GameState* state){
+
+    for(int y = 0 ; y < GRID_HEIGHT ; y++){
+        for(int x = 0 ; x < GRID_WIDTH ; x++){
+            state->grid[x][y] = 0;
+        }
+    }
+
+    state->score = 0;
+    state->level = 1;
+    state->lines_cleared = 0;
+    state->game_over = false;
+    state->drop_speed = 1000;
+    state->last_drop_time = SDL_GetTicks();
+
+    new_random_tetromino(state);
+
+}
+
+void update_game(GameState* state){
+    Uint32 current_time = SDL_GetTicks();
+
+    // Vérifier s'il est temps de faire descendre la pièce
+    if (current_time - state->last_drop_time > state->drop_speed) {
+        // Essayer de déplacer la pièce vers le bas
+        if (!check_collision(state->current_piece.x, state->current_piece.y + 1, state->current_piece.type, state->current_piece.rotation)) {
+            state->current_piece.y++;
+        } else {
+            // Si on ne peut pas descendre, placer la pièce dans la grille
+            place_piece(state);
+        }
+        state->last_drop_time = current_time;
+
+    }
+
+}
+
+void place_piece(GameState* state)
+{
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (TETROMINOS[state->current_piece.type][state->current_piece.rotation][i][j] != 0) {
+                int grid_x = state->current_piece.x + j;
+                int grid_y = state->current_piece.y + i;
+                
+                if (grid_y >= 0 && grid_y < GRID_HEIGHT && grid_x >= 0 && grid_x < GRID_WIDTH) {
+                    // +1 car 0 est réservé pour les cases vides
+                    state->grid[grid_y][grid_x] = TETROMINOS[state->current_piece.type][state->current_piece.rotation][i][j];
+                }
+            }
+        }
+    }
+    
+    clear_lines(state);
+    new_random_tetromino(state);
+}
