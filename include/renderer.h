@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "grid.h"
 #include "tetromino.h"
+#include "game.h"
 
 extern const SDL_Color COLORS[];
 
@@ -14,6 +15,6 @@ extern const SDL_Color COLORS[];
 
 void init_renderer(SDL_Window** window, SDL_Renderer** renderer);
 void clean_renderer(SDL_Window* window, SDL_Renderer* renderer);
-void draw_on_renderer(SDL_Renderer* renderer);
+void draw_on_renderer(SDL_Renderer* renderer, GameState* state);
 
 #endif

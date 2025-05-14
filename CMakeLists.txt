@@ -5,6 +5,8 @@ project(tetriste)
 
 # Spécifie que le projet utilise le langage C
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+
 
 
 # Recherche de la bibliothèque SDL2

@@ -1,5 +1,7 @@
 // main.c
 #include <time.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include "game.h"
 #include "renderer.h"
 #include "input.h"
@@ -12,23 +14,27 @@ int main(int argc, char** argv) {
     }
 
     // Initialisation du générateur de nombres aléatoires
-    srand(time(NULL));
-    SDL_Window* window = NULL;
-    SDL_Renderer* renderer = NULL;
-    init_renderer(&window, &renderer);
+    srand((unsigned int)time(NULL));
+
 
     // Initialiser l'état du jeu
     GameState state;
-    init_game(&state); // Assurez-vous d'initialiser correctement l'état du jeu
+    init_game(&state);
+
+    SDL_Window* window = NULL;
+    SDL_Renderer* renderer = NULL;
+    
+    init_renderer(&window, &renderer);
+
+     
 
     // Boucle principale du jeu
     bool quit = false;
     SDL_Event event;
     while (!quit && !state.game_over) {
         handle_input(&event, &quit, &state); // Gestion des entrées
-
         update_game(&state); // Mise à jour de l'état du jeu
-        draw_on_renderer(&state); // Rendu graphique
+        draw_on_renderer(renderer, &state); // Rendu graphique
         SDL_Delay(16); // ~60 FPS
     }
 

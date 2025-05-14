@@ -8,7 +8,7 @@ void init_game(GameState* state){
 
     for(int y = 0 ; y < GRID_HEIGHT ; y++){
         for(int x = 0 ; x < GRID_WIDTH ; x++){
-            state->grid[x][y] = 0;
+            state->grid[y][x] = 0;
         }
     }
 
@@ -19,12 +19,24 @@ void init_game(GameState* state){
     state->drop_speed = 1000;
     state->last_drop_time = SDL_GetTicks();
 
+    state->current_piece.x = 3;
+    state->current_piece.y = 0;
+    state->current_piece.type = rand() % 7;       // types 0 à 6
+    state->current_piece.rotation = 0;
+
+
     new_random_tetromino(state);
 
 }
 
 void update_game(GameState* state){
     Uint32 current_time = SDL_GetTicks();
+
+    printf("update_game: type=%d rot=%d x=%d y=%d\n", 
+        state->current_piece.type, 
+        state->current_piece.rotation, 
+        state->current_piece.x, 
+        state->current_piece.y);
 
     // Vérifier s'il est temps de faire descendre la pièce
     if (current_time - state->last_drop_time > state->drop_speed) {

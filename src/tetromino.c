@@ -71,7 +71,7 @@ void new_random_tetromino(GameState* state){
 }
 
 bool check_collision(GameState* state, int x, int y, int rotation) {
-
+    printf("check_collision: x=%d y=%d rot=%d -> ", x, y, rotation);
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             // Si la cellule est occupée par la pièce
@@ -81,6 +81,7 @@ bool check_collision(GameState* state, int x, int y, int rotation) {
                 
                 // Vérifier les limites de la grille
                 if (new_x < 0 || new_x >= GRID_WIDTH || new_y >= GRID_HEIGHT) {
+                    printf("bord\n");
                     return true;  // Collision avec les bords
                 }
                 
@@ -89,6 +90,7 @@ bool check_collision(GameState* state, int x, int y, int rotation) {
 
                 // Collision avec un bloc déjà présent ?
                 if (state->grid[new_y][new_x] != 0) {
+                    printf("bloc occupé\n");
                     return true;
                 }
             }
