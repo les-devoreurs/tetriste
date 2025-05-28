@@ -41,7 +41,7 @@ void update_game(GameState* state){
     // Vérifier s'il est temps de faire descendre la pièce
     if (current_time - state->last_drop_time > state->drop_speed) {
         // Essayer de déplacer la pièce vers le bas
-        if (!check_collision(state->current_piece.x, state->current_piece.y + 1, state->current_piece.type, state->current_piece.rotation)) {
+        if (!check_collision(state, state->current_piece.x, state->current_piece.y + 1, state->current_piece.type, state->current_piece.rotation)) {
             state->current_piece.y++;
         } else {
             // Si on ne peut pas descendre, placer la pièce dans la grille
