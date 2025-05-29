@@ -23,7 +23,7 @@ extern const int TETROMINOS[NUM_TETROMINOS][4][4][4];
 struct GameState;
 
 void new_random_tetromino(GameState* state);
-bool check_collision(GameState* state, int x, int y, int rotation);
+bool check_collision(GameState* state, int x, int y, int type, int rotation);
 void move_tetromino(GameState* state, int nx, int ny);
 void rotate_tetromino(GameState* state);
 void hard_drop(GameState* state);

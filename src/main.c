@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     }
 
     // Initialisation du générateur de nombres aléatoires
-    srand((unsigned int)time(NULL));
+    srand(time(NULL));
 
 
     // Initialiser l'état du jeu
@@ -31,8 +31,9 @@ int main(int argc, char** argv) {
     // Boucle principale du jeu
     bool quit = false;
     SDL_Event event;
+
     while (!quit && !state.game_over) {
-        handle_input(&event, &quit, &state); // Gestion des entrées
+        handle_input(&event, &quit, &state); // Gestion des entrées clavier
         update_game(&state); // Mise à jour de l'état du jeu
         draw_on_renderer(renderer, &state); // Rendu graphique
         SDL_Delay(16); // ~60 FPS

@@ -11,8 +11,8 @@
 
 
 typedef struct GameState{
-    int grid[GRID_HEIGHT][GRID_WIDTH];
     Tetromino current_piece;
+    int grid[GRID_HEIGHT][GRID_WIDTH];
     int score;
     int level;
     int lines_cleared;
