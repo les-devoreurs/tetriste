@@ -26,6 +26,7 @@ set(SRC_FILES
     src/renderer.c
     src/tetromino.c
     src/grid.c
+    src/bot.c
 )
 
 

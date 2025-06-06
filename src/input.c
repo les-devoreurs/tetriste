@@ -6,7 +6,7 @@
 // Fonction pour gérer les entrées du joueur
 void handle_input(SDL_Event* event, bool* quit, GameState* state) {
 
-    printf("handle_input: current x=%d y=%d\n", state->current_piece.x, state->current_piece.y);
+    //printf("handle_input: current x=%d y=%d\n", state->current_piece.x, state->current_piece.y);
     
     // Boucle sur les événements clavier
     while (SDL_PollEvent(event)) {

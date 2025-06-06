@@ -10,7 +10,7 @@ void clear_lines(GameState* state) {
 
         for (int x = 0; x < GRID_WIDTH; x++) {
             if (state->grid[y][x] == 0) {
-                line_full = true;
+                line_full = false;
                 break;
             }
         }
@@ -25,6 +25,7 @@ void clear_lines(GameState* state) {
                     state->grid[i][x] = state->grid[i-1][x];
                 }
             }
+            y++;
 
             // Remplir la ligne du haut avec des 0 
             for(int x = 0 ; x < GRID_WIDTH ; x++){
@@ -40,7 +41,6 @@ void clear_lines(GameState* state) {
                 state->level++;
                 state->lines_cleared = 0;
             }
-
         
         }
     }

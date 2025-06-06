@@ -4,13 +4,13 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-
 #include "grid.h"
 #include "tetromino.h"
 #include "input.h"
 
 
 typedef struct GameState{
+    Tetromino next_piece;
     Tetromino current_piece;
     int grid[GRID_HEIGHT][GRID_WIDTH];
     int score;

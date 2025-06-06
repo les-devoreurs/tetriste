@@ -40,22 +40,19 @@ void init_renderer(SDL_Window** window, SDL_Renderer** renderer)
 }
 
 void clean_renderer(SDL_Window* window, SDL_Renderer* renderer){
-
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
-
 }
 
-void draw_on_renderer(SDL_Renderer* renderer,GameState* state){
-
+void draw_on_renderer(SDL_Renderer* renderer,GameState* state, SDL_Rect viewport){
+    SDL_RenderSetViewport(renderer, &viewport);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
-    SDL_RenderClear(renderer);
 
     Tetromino* current_piece = &state->current_piece;
 
-    printf("DEBUG: renderer = %p, state = %p\n", renderer, state);
-    printf("DEBUG: current_piece type = %d, x = %d, y = %d, rot = %d\n",current_piece->type, current_piece->x, current_piece->y, current_piece->rotation);
+    //printf("DEBUG: renderer = %p, state = %p\n", renderer, state);
+    //printf("DEBUG: current_piece type = %d, x = %d, y = %d, rot = %d\n",current_piece->type, current_piece->x, current_piece->y, current_piece->rotation);
 
     // Dessiner la grille
     for (int y = 0; y < GRID_HEIGHT; y++) {
@@ -96,7 +93,28 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state){
             }
         }
     }
+
+    Tetromino* next_piece = &state->next_piece;
+    // Dessiner la pièce suivante
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (TETROMINOS[next_piece->type][next_piece->rotation][i][j] != 0) {
+                int x = (next_piece->x + j) * BLOCK_SIZE;
+                int y = (next_piece->y + i) * BLOCK_SIZE;
+                
+                if (next_piece->y + i >= 0) {  // Ne pas dessiner au-dessus de l'écran
+                    SDL_Rect block = {x, y, BLOCK_SIZE, BLOCK_SIZE};
+                    int color_index = next_piece->type+1;
+                    
+                    SDL_SetRenderDrawColor(renderer, COLORS[color_index].r, COLORS[color_index].g, COLORS[color_index].b, 255);
+                    SDL_RenderFillRect(renderer, &block);
+                    
+                    // Contour plus clair
+                    SDL_SetRenderDrawColor(renderer, COLORS[color_index].r + 40,COLORS[color_index].g + 40,COLORS[color_index].b + 40, 255);
+                    SDL_RenderDrawRect(renderer, &block);
+                }
+            }
+        }
+    }
     
-    // Afficher le résultat
-    SDL_RenderPresent(renderer);
 }

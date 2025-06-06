@@ -23,16 +23,21 @@ void init_game(GameState* state){
     state->current_piece.type = rand() % 7;       // types 0 à 6
     state->current_piece.rotation = 0;
 
+    state->next_piece.x = 11;
+    state->next_piece.y = 5;
+    state->next_piece.type = rand() % 7;       // types 0 à 6
+    state->next_piece.rotation = 0;
+
     new_random_tetromino(state);
 }
 
-void update_game(GameState* state){
-    Uint32 current_time = SDL_GetTicks();
+void update_game(GameState* state) {
+    //Uint32 current_time = SDL_GetTicks();
 
-    printf("update_game: type=%d rot=%d x=%d y=%d\n", state->current_piece.type, state->current_piece.rotation, state->current_piece.x, state->current_piece.y);
+    //printf("update_game: type=%d rot=%d x=%d y=%d\n", state->current_piece.type, state->current_piece.rotation, state->current_piece.x, state->current_piece.y);
 
     // Vérifier s'il est temps de faire descendre la pièce
-    if (current_time - state->last_drop_time > state->drop_speed) {
+    //if (current_time - state->last_drop_time > state->drop_speed) {
         // Essayer de déplacer la pièce vers le bas
         // if (!check_collision(state, state->current_piece.x, state->current_piece.y + 1, state->current_piece.type, state->current_piece.rotation)) {
         //     state->current_piece.y++;
@@ -46,8 +51,8 @@ void update_game(GameState* state){
             place_piece(state);
             return;
         }
-        state->last_drop_time = current_time;
-    }
+        //state->last_drop_time = current_time;
+    //}
 }
 
 void place_piece(GameState* state){
