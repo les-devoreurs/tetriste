@@ -10,7 +10,7 @@ void clear_lines(GameState* state) {
 
         for (int x = 0; x < GRID_WIDTH; x++) {
             if (state->grid[y][x] == 0) {
-                line_full = true;
+                line_full = false;
                 break;
             }
         }
