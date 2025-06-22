@@ -7,6 +7,7 @@ typedef struct GameState GameState;
 #define GRID_HEIGHT 20
 
 
-void clear_lines(GameState* state);
+int clear_lines(GameState* state);
+void add_garbage_lines(GameState* state, int number_lines);
 
 #endif

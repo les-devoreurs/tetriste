@@ -20,9 +20,14 @@ const SDL_Color COLORS[] = {
 
 SDL_Renderer* temp_renderer = NULL;  
 
-void init_renderer(SDL_Window** window, SDL_Renderer** renderer)
+int init_renderer(SDL_Window** window, SDL_Renderer** renderer, int gamemode)
 {
-    *window = SDL_CreateWindow("Tetriste", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    int modifier = 1;
+    if (gamemode == 1) {
+        modifier = 3;
+    }
+
+    *window = SDL_CreateWindow("Tetriste", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * modifier, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     
     if (!*window){
         printf("Erreur création fenêtre : %s\n", SDL_GetError());
@@ -37,6 +42,8 @@ void init_renderer(SDL_Window** window, SDL_Renderer** renderer)
     }
 
     temp_renderer = *renderer; 
+
+    return SCREEN_WIDTH * modifier;
 }
 
 void clean_renderer(SDL_Window* window, SDL_Renderer* renderer){
@@ -112,6 +119,31 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, SDL_Rect viewport
                     // Contour plus clair
                     SDL_SetRenderDrawColor(renderer, COLORS[color_index].r + 40,COLORS[color_index].g + 40,COLORS[color_index].b + 40, 255);
                     SDL_RenderDrawRect(renderer, &block);
+                }
+            }
+        }
+    }
+
+    // Dessiner la pièce de stocker si elle existe
+    if (state->stock_piece.type != -1) {
+        Tetromino* stock_piece = &state->stock_piece;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (TETROMINOS[stock_piece->type][stock_piece->rotation][i][j] != 0) {
+                    int x = (stock_piece->x + j) * BLOCK_SIZE;
+                    int y = (stock_piece->y + i) * BLOCK_SIZE;
+                    
+                    if (stock_piece->y + i >= 0) {  // Ne pas dessiner au-dessus de l'écran
+                        SDL_Rect block = {x, y, BLOCK_SIZE, BLOCK_SIZE};
+                        int color_index = stock_piece->type+1;
+                        
+                        SDL_SetRenderDrawColor(renderer, COLORS[color_index].r, COLORS[color_index].g, COLORS[color_index].b, 255);
+                        SDL_RenderFillRect(renderer, &block);
+                        
+                        // Contour plus clair
+                        SDL_SetRenderDrawColor(renderer, COLORS[color_index].r + 40,COLORS[color_index].g + 40,COLORS[color_index].b + 40, 255);
+                        SDL_RenderDrawRect(renderer, &block);
+                    }
                 }
             }
         }

@@ -57,26 +57,33 @@ const int TETROMINOS[7][4][4][4] = {
     }
 };
 
-void new_random_tetromino(GameState* state){
-    state->current_piece.type = rand() % NUM_TETROMINOS;
-    state->current_piece.rotation = 0;
-    state->current_piece.x = GRID_WIDTH / 2 - 2;
-    state->current_piece.y = -2;
+void pos_start_piece(Tetromino* state) {
+    state->rotation = 0;
+    state->x = GRID_WIDTH / 2 - 2;
+    state->y = -2;
 }
 
-bool check_collision(GameState* state, int x, int y, int type, int rotation) {
+void new_random_tetromino(Tetromino* current_piece, Tetromino* next_piece){
+    current_piece->type = next_piece->type;
+    pos_start_piece(current_piece);
+
+    next_piece->type = rand() % NUM_TETROMINOS;
+}
+
+//Tetromino* peut être pas necessaire
+bool check_collision(GameState* state, Tetromino* piece) {
 
     //printf("check_collision: x=%d y=%d rot=%d -> ", x, y, rotation);
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             
-            int block = TETROMINOS[type][rotation][i][j] != 0;
+            int block = TETROMINOS[piece->type][piece->rotation][i][j] != 0;
             
             // Si la cellule est occupée par la pièce
             if (block != 0) {
-                int new_x = x + j ;
-                int new_y = y + i ;
+                int new_x = piece->x + j ;
+                int new_y = piece->y + i ;
                 
                 // Vérifier les limites de la grille
                 if (new_x < 0 || new_x >= GRID_WIDTH || new_y >= GRID_HEIGHT) {
@@ -103,9 +110,14 @@ bool check_collision(GameState* state, int x, int y, int type, int rotation) {
 
 void move_tetromino(GameState* state, int nx, int ny) {
     // Vérifier si le déplacement ne génère pas de collision
-    //printf("move_tetromino: dx=%d dy=%d\n", nx, ny);
+    
+    Tetromino copy_temp;
+    copy_temp.x = state->current_piece.x + nx;
+    copy_temp.y = state->current_piece.y + ny;
+    copy_temp.type = state->current_piece.type;
+    copy_temp.rotation = state->current_piece.rotation;
 
-    if (!check_collision(state, state->current_piece.x + nx, state->current_piece.y + ny, state->current_piece.type, state->current_piece.rotation)) {
+    if (!check_collision(state, &copy_temp)) {
         state->current_piece.x += nx;
         state->current_piece.y += ny;
     }
@@ -114,14 +126,44 @@ void move_tetromino(GameState* state, int nx, int ny) {
 void rotate_tetromino(GameState* state) {
     int next_rotation = (state->current_piece.rotation + 1) % 4;
     // Vérifier si la rotation est valide
-    if (!check_collision(state, state->current_piece.x, state->current_piece.y, state->current_piece.type, next_rotation)) {
+    Tetromino copy_temp;
+    copy_temp.x = state->current_piece.x;
+    copy_temp.y = state->current_piece.y;
+    copy_temp.type = state->current_piece.type;
+    copy_temp.rotation = next_rotation;
+    if (!check_collision(state, &copy_temp)) {
         state->current_piece.rotation = next_rotation;
     }
 }
 
 void hard_drop(GameState* state) {
-    while (!check_collision(state, state->current_piece.x, state->current_piece.y + 1, state->current_piece.type, state->current_piece.rotation)) {
+    Tetromino copy_temp;
+    copy_temp.x = state->current_piece.x;
+    copy_temp.y = state->current_piece.y + 1;
+    copy_temp.type = state->current_piece.type;
+    copy_temp.rotation = state->current_piece.rotation;
+
+    while (!check_collision(state, &copy_temp)) {
         state->current_piece.y += 1;
+        
+        copy_temp.y = state->current_piece.y + 1;
     }
 }
 
+void stock_tetromino(GameState* state) {
+    if (!state->has_already_stock) {
+        if (state->stock_piece.type == -1) {
+            //si vide juste passer a la pièce suivante et stocker celle actuel
+            state->stock_piece.type = state->current_piece.type;
+            new_random_tetromino(&state->current_piece, &state->next_piece);
+        }
+        else {
+            //sinon mettre le type de la pièce en stock a la place de celle en stock et celle actuel en stock
+            int stock_piece_type = state->stock_piece.type;
+            state->stock_piece.type = state->current_piece.type;
+            state->current_piece.type = stock_piece_type;
+            pos_start_piece(&state->current_piece);
+        }
+        state->has_already_stock = true;
+    }
+}

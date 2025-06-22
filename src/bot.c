@@ -5,6 +5,7 @@
 
 
 int evaluate_position(GameState* state) {
+
     int score = 0;
     int lines_cleared = 0;
     int holes = 0;
@@ -80,46 +81,72 @@ void copy_game_state(const GameState* src, GameState* copy) {
     }
 }
 
-void move_piece(GameState* state, int rotation, int x, int y) {
-    state->current_piece.rotation = rotation;
-    state->current_piece.x = x;
-    state->current_piece.y = y;
+void move_piece(GameState* state, Tetromino piece) {
+    state->current_piece.rotation = piece.rotation;
+    state->current_piece.x = piece.x;
+    state->current_piece.y = piece.y;
 }
 
-BotMove find_best_move(GameState* state) {
+Tetromino find_best_move(GameState* state) {
 
-    
-    BotMove best_move = {0, 0, 0, false};
+    Tetromino best_move = {0, 0, 0, 0};
     int best_score = INT_MIN;
 
     // Parcours des rotations possibles
     for (int rotation = 0; rotation < 4; rotation++) {
         // Parcours des positions horizontales possibles
         for (int x = -2; x < GRID_WIDTH; x++) {
-            int y = 0;
             
             GameState preview;
             copy_game_state(state, &preview);
+            Tetromino copy_temp = { x, 0, preview.current_piece.type, rotation};
             // Trouver la position y où la pièce s'arrête
-            while (!check_collision(&preview, x, y, preview.current_piece.type, rotation)) {
-                y++;
+            while (!check_collision(&preview, &copy_temp)) {
+                copy_temp.y++;
             }
-            y--;
+            copy_temp.y--;
 
-            if (y < 0) continue; // Position invalide
+            int score = INT_MIN;
+            if (copy_temp.y >= 0) {
+                // Placer la pièce sur la grille temporaire dans la position (rotation, x, y)
+                move_piece(&preview, copy_temp);
+                place_piece(&preview, &preview.current_piece);
+                
+                // Évaluer la position
+                score = evaluate_position(&preview);
+            }
 
-            // Placer la pièce sur la grille temporaire dans la position (rotation, x, y)
-            move_piece(&preview, rotation, x, y);
-            place_piece(&preview);
-            
-            // Évaluer la position
-            int score = evaluate_position(&preview);
-            
-            if (score > best_score) {
+            Tetromino piece_next_or_stock;
+            if (preview.stock_piece.type == -1){
+                piece_next_or_stock = (Tetromino) { x, 0, preview.stock_piece.type, rotation};
+            }
+            else {
+                piece_next_or_stock = (Tetromino) { x, 0, preview.next_piece.type, rotation};
+            }
+
+            while (!check_collision(&preview, &piece_next_or_stock)) {
+                piece_next_or_stock.y++;
+            }
+            piece_next_or_stock.y--;
+
+            int score_next_or_stock = INT_MIN;
+            if (piece_next_or_stock.y >= 0) {
+                // Placer la pièce sur la grille temporaire dans la position (rotation, x, y)
+                move_piece(&preview, piece_next_or_stock);
+                place_piece(&preview, &piece_next_or_stock);
+
+                // Évaluer la position
+                score_next_or_stock = evaluate_position(&preview);
+            }
+
+            if ( (score == score_next_or_stock || score > score_next_or_stock) && score > best_score) {
                 best_score = score;
-                best_move.x = x;
-                best_move.y = y;
-                best_move.rotation = rotation;
+                best_move = copy_temp;
+            }
+            else if (score_next_or_stock > score && score_next_or_stock > best_score) {
+                best_score = score_next_or_stock;
+                best_move = piece_next_or_stock;
+
             }
         }
     }
@@ -127,7 +154,12 @@ BotMove find_best_move(GameState* state) {
     return best_move;
 }
 
-void apply_move_bot(GameState* state, BotMove* best_movement) {
+//Tetromino* peut être pas necessaire
+bool apply_move_bot(GameState* state, Tetromino* best_movement) {
+
+    if (state->current_piece.type != best_movement->type){
+        stock_tetromino(state);
+    }
 
     if (state->current_piece.rotation != best_movement->rotation)
     {
@@ -148,14 +180,12 @@ void apply_move_bot(GameState* state, BotMove* best_movement) {
         move_tetromino(state, 0, 1);
     }
 
-
-    printf("y .. %u : %u \n", state->current_piece.y, best_movement->y);
-    printf("x .. %u : %u \n", state->current_piece.x, best_movement->x);
-    printf("r .. %u : %u \n", state->current_piece.rotation, best_movement->rotation);
     if (state->current_piece.y == best_movement->y
         && state->current_piece.x == best_movement->x
         && state->current_piece.rotation == best_movement->rotation
     ) {
-        best_movement->done = true;
+        return true;
     }
+    return false;
 }
+

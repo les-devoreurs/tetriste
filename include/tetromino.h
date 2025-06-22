@@ -22,10 +22,12 @@ extern const int TETROMINOS[NUM_TETROMINOS][4][4][4];
 
 struct GameState;
 
-void new_random_tetromino(GameState* state);
-bool check_collision(GameState* state, int x, int y, int type, int rotation);
+void pos_start_piece(Tetromino* state);
+void new_random_tetromino(Tetromino* current_piece, Tetromino* next_piece);
+bool check_collision(GameState* state, Tetromino* tetromino);
 void move_tetromino(GameState* state, int nx, int ny);
 void rotate_tetromino(GameState* state);
 void hard_drop(GameState* state);
+void stock_tetromino(GameState* state);
 
 #endif

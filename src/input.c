@@ -38,6 +38,10 @@ void handle_input(SDL_Event* event, bool* quit, GameState* state) {
                         hard_drop(state);
                         break;
 
+                    case SDLK_s: // Stock
+                        stock_tetromino(state);
+                        break;
+
                     case SDLK_ESCAPE: // Quitter le jeu
                         *quit = true;
                         break;
