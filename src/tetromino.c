@@ -71,7 +71,7 @@ void new_random_tetromino(GameState* state){
 
 bool check_collision(GameState* state, int x, int y, int type, int rotation) {
 
-    printf("check_collision: x=%d y=%d rot=%d -> ", x, y, rotation);
+    //printf("check_collision: x=%d y=%d rot=%d -> ", x, y, rotation);
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -85,7 +85,7 @@ bool check_collision(GameState* state, int x, int y, int type, int rotation) {
                 
                 // Vérifier les limites de la grille
                 if (new_x < 0 || new_x >= GRID_WIDTH || new_y >= GRID_HEIGHT) {
-                    printf("bord\n");
+                    //printf("bord\n");
                     return true;  // Collision avec les bords
                 }
                 
@@ -108,7 +108,6 @@ bool check_collision(GameState* state, int x, int y, int type, int rotation) {
 
 void move_tetromino(GameState* state, int nx, int ny) {
     // Vérifier si le déplacement ne génère pas de collision
-    printf("move_tetromino: dx=%d dy=%d\n", nx, ny);
 
     if (!check_collision(state, state->current_piece.x + nx, state->current_piece.y + ny, state->current_piece.type, state->current_piece.rotation)) {
         state->current_piece.x += nx;

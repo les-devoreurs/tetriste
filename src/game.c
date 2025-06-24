@@ -29,8 +29,6 @@ void init_game(GameState* state){
 void update_game(GameState* state){
     Uint32 current_time = SDL_GetTicks();
 
-    printf("update_game: type=%d rot=%d x=%d y=%d\n", state->current_piece.type, state->current_piece.rotation, state->current_piece.x, state->current_piece.y);
-
     // Vérifier s'il est temps de faire descendre la pièce
     if (current_time - state->last_drop_time > state->drop_speed) {
         // Essayer de déplacer la pièce vers le bas
@@ -71,5 +69,12 @@ void place_piece(GameState* state){
     
     clear_lines(state);
     new_random_tetromino(state);
+
+        // Vcheck la collision, si oui game over
+        Tetromino* new_piece = &state->current_piece;
+        if (check_collision(state, new_piece->x, new_piece->y, new_piece->type, new_piece->rotation)) {
+            state->game_over = true;
+        }
+
     state->last_drop_time = SDL_GetTicks(); 
 }

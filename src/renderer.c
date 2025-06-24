@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL2/SDL_ttf.h>
 
 // Couleurs des tetrominos (R,G,B)
 const SDL_Color COLORS[] = {
@@ -19,6 +20,18 @@ const SDL_Color COLORS[] = {
 };
 
 SDL_Renderer* temp_renderer = NULL;  
+
+void render_text(SDL_Renderer* renderer, const char* text, int x, int y, SDL_Color color, TTF_Font* font) {
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text, color);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    SDL_Rect dest = { x, y, surface->w, surface->h };
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+}
+
 
 void init_renderer(SDL_Window** window, SDL_Renderer** renderer)
 {
@@ -47,15 +60,12 @@ void clean_renderer(SDL_Window* window, SDL_Renderer* renderer){
 
 }
 
-void draw_on_renderer(SDL_Renderer* renderer,GameState* state){
+void draw_on_renderer(SDL_Renderer* renderer, GameState* state, TTF_Font* font){
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
     SDL_RenderClear(renderer);
 
     Tetromino* current_piece = &state->current_piece;
-
-    printf("DEBUG: renderer = %p, state = %p\n", renderer, state);
-    printf("DEBUG: current_piece type = %d, x = %d, y = %d, rot = %d\n",current_piece->type, current_piece->x, current_piece->y, current_piece->rotation);
 
     // Dessiner la grille
     for (int y = 0; y < GRID_HEIGHT; y++) {
@@ -96,7 +106,35 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state){
             }
         }
     }
+    char buffer[64];
+    SDL_Color white = {255, 255, 255, 255};
+
+    int separator_x = GRID_WIDTH * BLOCK_SIZE;  // à droite de la grille
+
+    int text_x = separator_x + 20;  // 20px droite de la ligne verticale
+
+    // texte
+    sprintf(buffer, "Score: %d", state->score);
+    render_text(renderer, buffer, text_x, 50, white, font);
     
-    // Afficher le résultat
+    sprintf(buffer, "Niveau: %d", state->level);
+    render_text(renderer, buffer, text_x, 100, white, font);
+    
+    sprintf(buffer, "Lignes: %d", state->lines_cleared);
+    render_text(renderer, buffer, text_x, 150, white, font);
+    
+
+    //ligne verticale fine (1 pixel)
+    SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+    SDL_RenderDrawLine(renderer, separator_x, 0, separator_x, SCREEN_HEIGHT);
+    
+    //zone d'info
+    SDL_Rect info_area = {separator_x + 1, 0, SCREEN_WIDTH - (separator_x + 1), SCREEN_HEIGHT};
+    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
+    SDL_RenderFillRect(renderer, &info_area);
+    
+    SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+    SDL_RenderDrawLine(renderer, separator_x, 0, separator_x, SCREEN_HEIGHT);
+    
     SDL_RenderPresent(renderer);
 }

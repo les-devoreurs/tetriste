@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "game.h"
 
-void handle_input(SDL_Event* event, bool* quit, GameState* state);
+// ajout d'un bool return to menu
+void handle_input(SDL_Event* event, bool* quit, GameState* state, bool* return_to_menu);
 
 #endif
