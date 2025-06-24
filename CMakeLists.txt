@@ -25,6 +25,7 @@ set(SRC_FILES
     src/grid.c
     src/menu.c
     src/scores.c
+    src/bot.c
 )
 
 add_executable(tetriste_game ${SRC_FILES})

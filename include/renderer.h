@@ -13,9 +13,10 @@ extern const SDL_Color COLORS[];
 #define SCREEN_HEIGHT (GRID_HEIGHT * BLOCK_SIZE)
 
 
-void init_renderer(SDL_Window** window, SDL_Renderer** renderer);
+int init_renderer(SDL_Window** window, SDL_Renderer** renderer, int gamemode);
 void clean_renderer(SDL_Window* window, SDL_Renderer* renderer);
-void draw_on_renderer(SDL_Renderer* renderer, GameState* state, TTF_Font* font);
+
+void draw_on_renderer(SDL_Renderer* renderer, GameState* state, TTF_Font* font, SDL_Rect viewport);
 void render_text(SDL_Renderer* renderer, const char* text, int x, int y, SDL_Color color, TTF_Font* font);
 
 #endif

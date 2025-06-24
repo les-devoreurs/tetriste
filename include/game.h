@@ -4,14 +4,16 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-
 #include "grid.h"
 #include "tetromino.h"
 #include "input.h"
 
 
 typedef struct GameState{
+    Tetromino next_piece;
     Tetromino current_piece;
+    Tetromino stock_piece;
+    bool has_already_stock;
     int grid[GRID_HEIGHT][GRID_WIDTH];
     int score;
     int level;
@@ -22,7 +24,7 @@ typedef struct GameState{
 } GameState;
 
 void init_game(GameState* state);
-void update_game(GameState* state);
-void place_piece(GameState* state );
+int update_game(GameState* state);
+int place_piece(GameState* state, Tetromino* tetromino );
 
 #endif

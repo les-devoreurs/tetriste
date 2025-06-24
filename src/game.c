@@ -17,64 +17,65 @@ void init_game(GameState* state){
     state->game_over = false;
     state->drop_speed = 1000;
     state->last_drop_time = SDL_GetTicks();
+    state->has_already_stock = false;
 
-    state->current_piece.x = 3;
-    state->current_piece.y = 0;
-    state->current_piece.type = rand() % 7;       // types 0 à 6
-    state->current_piece.rotation = 0;
+    state->next_piece.x = 11;
+    state->next_piece.y = 5;
+    state->next_piece.type = rand() % 7;       // types 0 à 6
+    state->next_piece.rotation = 0;
 
-    new_random_tetromino(state);
+    state->stock_piece.x = 11;
+    state->stock_piece.y = 9;
+    state->stock_piece.type = -1;
+    state->stock_piece.rotation = 0;
+
+    new_random_tetromino(&state->current_piece, &state->next_piece);
 }
 
-void update_game(GameState* state){
-    Uint32 current_time = SDL_GetTicks();
 
-    // Vérifier s'il est temps de faire descendre la pièce
-    if (current_time - state->last_drop_time > state->drop_speed) {
-        // Essayer de déplacer la pièce vers le bas
-        // if (!check_collision(state, state->current_piece.x, state->current_piece.y + 1, state->current_piece.type, state->current_piece.rotation)) {
-        //     state->current_piece.y++;
-        Tetromino* piece = &state->current_piece;
+int update_game(GameState* state) {
 
-        if(!check_collision(state, piece->x, piece->y+1, piece->type, piece->rotation)){
-            piece->y++;
-            //state->last_drop_time = current_time;
-        } else {
-            // Si on ne peut pas descendre, placer la pièce dans la grille
-            place_piece(state);
-            return;
-        }
-        state->last_drop_time = current_time;
+    Tetromino piece = {state->current_piece.x, state->current_piece.y + 1, state->current_piece.type, state->current_piece.rotation};
+
+    if(!check_collision(state, &piece)){
+        state->current_piece.y++;
+        return -1;
+    } else {
+        // Si on ne peut pas descendre, placer la pièce dans la grille
+        return place_piece(state, &state->current_piece);
     }
 }
 
-void place_piece(GameState* state){
+//Tetromino* peut être pas necessaire
+int place_piece(GameState* state, Tetromino* tetromino) {
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            int block = TETROMINOS[state->current_piece.type][state->current_piece.rotation][i][j];
+            int block = TETROMINOS[tetromino->type][tetromino->rotation][i][j];
             
             if (block != 0) {
-                int grid_x = state->current_piece.x + j;
-                int grid_y = state->current_piece.y + i;
+                int grid_x = tetromino->x + j;
+                int grid_y = tetromino->y + i;
                 
                 if (grid_y >= 0 && grid_y < GRID_HEIGHT && grid_x >= 0 && grid_x < GRID_WIDTH) {
                     // +1 car 0 est réservé pour les cases vides
-                    //state->grid[grid_y][grid_x] = TETROMINOS[state->current_piece.type][state->current_piece.rotation][i][j];
-                    state->grid[grid_y][grid_x] = state->current_piece.type +1;
+                    state->grid[grid_y][grid_x] = tetromino->type +1;
+
+                    //if (state->drop_speed > 500) {
+                    //    printf(" %u : %u \n", grid_y, grid_x);
+                    //}
+                    if(grid_y == 0) {
+                        //printf(" %u : %u \n", grid_y, state->drop_speed);
+                        state->game_over = true;
+                    }
                 }
             }
         }
     }
     
-    clear_lines(state);
-    new_random_tetromino(state);
 
-        // Vcheck la collision, si oui game over
-        Tetromino* new_piece = &state->current_piece;
-        if (check_collision(state, new_piece->x, new_piece->y, new_piece->type, new_piece->rotation)) {
-            state->game_over = true;
-        }
-
-    state->last_drop_time = SDL_GetTicks(); 
+    new_random_tetromino(tetromino, &state->next_piece);
+    state->last_drop_time = SDL_GetTicks();
+    state->has_already_stock = false;
+    return clear_lines(state);
 }
