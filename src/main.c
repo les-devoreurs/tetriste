@@ -133,6 +133,7 @@ int main(int argc, char** argv) {
             char player_name[MAX_NAME_LENGTH];
             const char* score_file = "src/scores.txt";
             
+            resize_window(window, 0);
             
             if (selected_option == 0) { // Mode classique
                 printf("Game Over! Score: %u\n", statePlayer.score);
@@ -143,40 +144,16 @@ int main(int argc, char** argv) {
                 
                 // Afficher les scores avec le score actuel
                 display_game_over_scores(renderer, font, score_file, 
-                                    player_name, statePlayer.score, 0);
+                                    player_name, statePlayer.score);
                                     
             } else if (selected_option == 1) { // Mode duel
                 if (statePlayer.game_over) {
                     printf("Game Over! You lose against the bot!\n");
-                    get_player_name(player_name, MAX_NAME_LENGTH);
-                    
-                    // Même en cas de défaite, on sauvegarde le score
-                    save_score(score_file, player_name, statePlayer.score);
-                    display_game_over_scores(renderer, font, score_file, 
-                                        player_name, statePlayer.score, 1);
-                                        
                 } else if (stateBot.game_over) {
                     printf("Win! You win against the bot!\n");
-                    get_player_name(player_name, MAX_NAME_LENGTH);
-                    
-                    // Bonus pour la victoire (optionnel)
-                    int final_score = statePlayer.score + 500; // bonus victoire
-                    save_score(score_file, player_name, final_score);
-                    display_game_over_scores(renderer, font, score_file, 
-                                        player_name, final_score, 1);
                 }
             }
         }
-        /*
-        if (state.game_over) {
-            char name[MAX_NAME_LENGTH] = "Joueur"; //score mais pas encore implémenter
-            save_score("src/scores.txt", name, state.score);
-            SDL_Delay(2000);
-            
-        }*/
-
-        //revenir au menu si le bool return_to_menu true, sinon on boucle (ou quitte)
-
     }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

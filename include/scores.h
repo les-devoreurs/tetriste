@@ -19,7 +19,7 @@ int load_scores(const char* filename, ScoreEntry* scores, int max);
 void sort_scores(ScoreEntry* scores, int count);
 void display_scores(SDL_Renderer* renderer, TTF_Font* font, ScoreEntry* scores, int count);
 void display_game_over_scores(SDL_Renderer* renderer, TTF_Font* font, const char* filename, 
-    const char* player_name, int player_score, int game_mode);
+    const char* player_name, int player_score);
 int find_player_rank(ScoreEntry* scores, int count, int player_score);
 void get_player_name(char* name, int max_length);
 #endif

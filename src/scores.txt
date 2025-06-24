@@ -2,3 +2,15 @@ Alice 1500
 Bob 1200
 Charlie 1000
 mina 100
+maxime 0
+mm 0
+sss 0
+test 0
+dd 0
+def 0
+non 0
+oups 0
+mmm 0
+test 0
+cheh 0
+jjjjjjjjjjjj 0

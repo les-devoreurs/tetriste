@@ -64,8 +64,8 @@ void clean_renderer(SDL_Window* window, SDL_Renderer* renderer){
 
 
 void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, SDL_Rect viewport){
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
     SDL_RenderSetViewport(renderer, &viewport);
-    //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
 
     Tetromino* current_piece = &state->current_piece;
 
@@ -173,7 +173,7 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, S
     sprintf(buffer, "Lignes: %d", state->lines_cleared);
     render_text(renderer, buffer, text_x, 150, white, font);
 
-    /*
+    
     //ligne verticale fine (1 pixel)
     SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
     SDL_RenderDrawLine(renderer, separator_x, 0, separator_x, SCREEN_HEIGHT);
@@ -185,8 +185,6 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, S
     
     SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
     SDL_RenderDrawLine(renderer, separator_x, 0, separator_x, SCREEN_HEIGHT);
-    
-    SDL_RenderPresent(renderer);*/
 }
 
 int resize_window(SDL_Window* window, int gamemode) {

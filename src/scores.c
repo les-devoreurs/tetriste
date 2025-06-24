@@ -99,7 +99,7 @@ void get_player_name(char* name, int max_length) {
 }
 
 void display_game_over_scores(SDL_Renderer* renderer, TTF_Font* font, const char* filename, 
-                             const char* player_name, int player_score, int game_mode) {
+                             const char* player_name, int player_score) {
     
     ScoreEntry scores[MAX_SCORES];
     int count = load_scores(filename, scores, MAX_SCORES);
@@ -139,8 +139,7 @@ void display_game_over_scores(SDL_Renderer* renderer, TTF_Font* font, const char
     SDL_Color yellow = {255, 255, 0, 255};
     SDL_Color red = {255, 100, 100, 255};
     
-    const char* title = (game_mode == 0) ? "GAME OVER - Mode Classique" : 
-                       (game_mode == 1) ? "GAME OVER - Mode Duel" : "GAME OVER";
+    const char* title = "GAME OVER - Mode Classique";
     render_text(renderer, title, 30, 30, red, font);
     
     // Score du joueur
@@ -186,8 +185,7 @@ void display_game_over_scores(SDL_Renderer* renderer, TTF_Font* font, const char
             if (event.type == SDL_QUIT) {
                 wait = false;
             } else if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_RETURN || 
-                    event.key.keysym.sym == SDLK_ESCAPE) {
+                if (event.key.keysym.sym == SDLK_SPACE) {
                     wait = false;
                 }
             }
