@@ -27,6 +27,25 @@ void save_score(const char* filename, const char* name, int score) {
         strcpy(scores[count].name, name);
         scores[count].score = score;
         count++;
+    } else if (!updated && count == MAX_SCORES) {
+        int pos = -1;
+        for (size_t i = 0; i < count; i++)
+        {
+            if (scores[i].score <= score){
+                pos = i;
+                break;
+            }
+        }
+
+        if (pos >= 0 && pos < MAX_SCORES) {
+            for (size_t i = MAX_SCORES - 1; i > pos; i--)
+            {
+                scores[i] = scores[i-1];
+            }
+            strcpy(scores[pos].name, name);
+            scores[pos].score = score;
+        }
+        
     }
 
     // Réécrire tout le fichier
@@ -44,7 +63,7 @@ int load_scores(const char* filename, ScoreEntry* scores, int max) {
     if (!f) return 0;
 
     int count = 0;
-    while (count < max && fscanf(f, "%19s %d", scores[count].name, &scores[count].score) == 2) {
+    while (fscanf(f, "%19s %d", scores[count].name, &scores[count].score) == 2) {
         count++;
     }
 
@@ -89,14 +108,15 @@ void display_scores(SDL_Renderer* renderer, TTF_Font* font, ScoreEntry* scores, 
         }
     }
 }
-    int find_player_rank(ScoreEntry* scores, int count, int player_score) {
-        for (int i = 0; i < count; i++) {
-            if (scores[i].score == player_score) {
-                return i + 1; 
-            }
+    
+int find_player_rank(ScoreEntry* scores, int count, int player_score) {
+    for (int i = 0; i < count; i++) {
+        if (scores[i].score == player_score) {
+            return i + 1; 
         }
-        return -1; 
     }
+    return -1; 
+}
 
 void get_player_name(char* name, int max_length) {
     printf("Entrez votre nom (max %d caractères): ", max_length - 1);

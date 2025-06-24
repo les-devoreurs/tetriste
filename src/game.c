@@ -19,15 +19,8 @@ void init_game(GameState* state){
     state->last_drop_time = SDL_GetTicks();
     state->has_already_stock = false;
 
-    state->next_piece.x = 11;
-    state->next_piece.y = 5;
     state->next_piece.type = rand() % 7;       // types 0 à 6
-    state->next_piece.rotation = 0;
-
-    state->stock_piece.x = 11;
-    state->stock_piece.y = 9;
     state->stock_piece.type = -1;
-    state->stock_piece.rotation = 0;
 
     new_random_tetromino(&state->current_piece, &state->next_piece);
 }

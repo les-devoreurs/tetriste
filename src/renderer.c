@@ -64,8 +64,10 @@ void clean_renderer(SDL_Window* window, SDL_Renderer* renderer){
 
 
 void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, SDL_Rect viewport){
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
     SDL_RenderSetViewport(renderer, &viewport);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
+    SDL_RenderFillRect(renderer, NULL);
+
 
     Tetromino* current_piece = &state->current_piece;
 
@@ -108,17 +110,21 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, S
             }
         }
     }
-    Tetromino* next_piece = &state->next_piece;
+    
+    int next_piece_type = state->next_piece.type;
+
+    state->next_piece.x = 11;
+    state->next_piece.y = 6;
     // Dessiner la pièce suivante
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            if (TETROMINOS[next_piece->type][next_piece->rotation][i][j] != 0) {
-                int x = (next_piece->x + j) * BLOCK_SIZE;
-                int y = (next_piece->y + i) * BLOCK_SIZE;
+            if (TETROMINOS[next_piece_type][0][i][j] != 0) {
+                int x = (11 + j) * BLOCK_SIZE;
+                int y = (7 + i) * BLOCK_SIZE;
                 
-                if (next_piece->y + i >= 0) {  // Ne pas dessiner au-dessus de l'écran
+                if (11 + i >= 0) {  // Ne pas dessiner au-dessus de l'écran
                     SDL_Rect block = {x, y, BLOCK_SIZE, BLOCK_SIZE};
-                    int color_index = next_piece->type+1;
+                    int color_index = next_piece_type+1;
                     
                     SDL_SetRenderDrawColor(renderer, COLORS[color_index].r, COLORS[color_index].g, COLORS[color_index].b, 255);
                     SDL_RenderFillRect(renderer, &block);
@@ -133,16 +139,16 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, S
     
     // Dessiner la pièce de stocker si elle existe
     if (state->stock_piece.type != -1) {
-        Tetromino* stock_piece = &state->stock_piece;
+        int stock_piece_type = state->stock_piece.type;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                if (TETROMINOS[stock_piece->type][stock_piece->rotation][i][j] != 0) {
-                    int x = (stock_piece->x + j) * BLOCK_SIZE;
-                    int y = (stock_piece->y + i) * BLOCK_SIZE;
+                if (TETROMINOS[stock_piece_type][0][i][j] != 0) {
+                    int x = (11 + j) * BLOCK_SIZE;
+                    int y = (11 + i) * BLOCK_SIZE;
                     
-                    if (stock_piece->y + i >= 0) {  // Ne pas dessiner au-dessus de l'écran
+                    if (11 + i >= 0) {  // Ne pas dessiner au-dessus de l'écran
                         SDL_Rect block = {x, y, BLOCK_SIZE, BLOCK_SIZE};
-                        int color_index = stock_piece->type+1;
+                        int color_index = stock_piece_type + 1;
                         
                         SDL_SetRenderDrawColor(renderer, COLORS[color_index].r, COLORS[color_index].g, COLORS[color_index].b, 255);
                         SDL_RenderFillRect(renderer, &block);

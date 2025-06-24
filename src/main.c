@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
                 display_game_over_scores(renderer, font, score_file, 
                                     player_name, statePlayer.score);
                                     
-            } if (statePlayer.game_over) {
+            } else if (statePlayer.game_over) {
                 display_duel_result(renderer, font, false);  // joueur a perdu
                 save_score(score_file, player_name, statePlayer.score);
             } else if (stateBot.game_over) {
