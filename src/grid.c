@@ -36,12 +36,18 @@ int clear_lines(GameState* state) {
             // Changement du score
             state->score += 100;
             state->lines_cleared++;
-            //printf(" %u : %u \n", state->lines_cleared, state->score);
             lines_cleared++;
             
             // Changement de niveau si besoin
-            if(state->lines_cleared >= 10){
+            if(state->lines_cleared % 5 == 0){
                 state->level++;
+                //printf(" passe \n");
+                if (state->drop_speed <= 100) {
+                    state->drop_speed = 100;
+                }
+                else {
+                    state->drop_speed = state->drop_speed - 100;
+                }
                 state->lines_cleared = 0;
             }
         
@@ -63,7 +69,7 @@ void add_garbage_lines(GameState* state, int number_lines) {
         // Ajouter une nouvelle ligne en bas avec un trou aléatoire
         int hole_x = rand() % GRID_WIDTH;
         for (int x = 0; x < GRID_WIDTH; x++) {
-            state->grid[GRID_HEIGHT - 1][x] = (x == hole_x) ? 0 : 10;
+            state->grid[GRID_HEIGHT - 1][x] = (x == hole_x) ? 0 : 9;
         }
     }
 }

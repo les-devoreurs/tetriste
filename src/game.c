@@ -38,7 +38,7 @@ int update_game(GameState* state) {
 
     if(!check_collision(state, &piece)){
         state->current_piece.y++;
-        return 0;
+        return -1;
     } else {
         // Si on ne peut pas descendre, placer la pièce dans la grille
         return place_piece(state, &state->current_piece);

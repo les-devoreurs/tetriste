@@ -10,6 +10,7 @@ int evaluate_position(GameState* state) {
     int lines_cleared = 0;
     int holes = 0;
     int max_height = 0;
+    int x_max_height = 0;
     
     // Calcul du nombre de lignes complètes
     for (int y = 0; y < GRID_HEIGHT; y++) {
@@ -29,7 +30,10 @@ int evaluate_position(GameState* state) {
         for (int y = 0; y < GRID_HEIGHT; y++) {
             if (state->grid[y][x]) {
                 block_found = 1;
-                if (GRID_HEIGHT - y > max_height) max_height = GRID_HEIGHT - y;
+                if (GRID_HEIGHT - y > max_height) {
+                    max_height = GRID_HEIGHT - y;
+                    x_max_height = x;
+                }
             } else if (block_found) {
                 holes++;
             }
@@ -40,7 +44,6 @@ int evaluate_position(GameState* state) {
     score += lines_cleared * 100;
     score -= holes * 50;
     score -= max_height * 10;
-
     return score;
 }
 

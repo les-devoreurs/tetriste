@@ -15,14 +15,16 @@ const SDL_Color COLORS[] = {
     {255, 255, 0},   // 4 - Jaune (O)
     {0, 255, 0},     // 5 - Vert (S)
     {128, 0, 128},   // 6 - Violet (T)
-    {255, 0, 0}      // 7 - Rouge (Z)
+    {255, 0, 0},     // 7 - Rouge (Z)
+    {255, 255, 255}, // 8 - Blanc (Contour)
+    {128,128,128}, // 9 - Gris (Ligne ajouter en VS bot )
 };
 
 SDL_Renderer* temp_renderer = NULL;  
 
 int init_renderer(SDL_Window** window, SDL_Renderer** renderer, int gamemode)
 {
-    int modifier = 1;
+    float modifier = 1.5;
     if (gamemode == 1) {
         modifier = 3;
     }
@@ -57,9 +59,6 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, SDL_Rect viewport
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
 
     Tetromino* current_piece = &state->current_piece;
-
-    //printf("DEBUG: renderer = %p, state = %p\n", renderer, state);
-    //printf("DEBUG: current_piece type = %d, x = %d, y = %d, rot = %d\n",current_piece->type, current_piece->x, current_piece->y, current_piece->rotation);
 
     // Dessiner la grille
     for (int y = 0; y < GRID_HEIGHT; y++) {
