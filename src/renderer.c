@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL2/SDL_ttf.h>
 
 // Couleurs des tetrominos (R,G,B)
 const SDL_Color COLORS[] = {
@@ -21,6 +22,19 @@ const SDL_Color COLORS[] = {
 };
 
 SDL_Renderer* temp_renderer = NULL;  
+
+
+void render_text(SDL_Renderer* renderer, const char* text, int x, int y, SDL_Color color, TTF_Font* font) {
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text, color);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    SDL_Rect dest = { x, y, surface->w, surface->h };
+    SDL_RenderCopy(renderer, texture, NULL, &dest);
+
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+}
+
 
 int init_renderer(SDL_Window** window, SDL_Renderer** renderer, int gamemode)
 {
@@ -54,7 +68,8 @@ void clean_renderer(SDL_Window* window, SDL_Renderer* renderer){
     SDL_Quit();
 }
 
-void draw_on_renderer(SDL_Renderer* renderer,GameState* state, SDL_Rect viewport){
+
+void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, SDL_Rect viewport){
     SDL_RenderSetViewport(renderer, &viewport);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
 
@@ -99,8 +114,7 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, SDL_Rect viewport
             }
         }
     }
-
-    Tetromino* next_piece = &state->next_piece;
+  Tetromino* next_piece = &state->next_piece;
     // Dessiner la pièce suivante
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -122,8 +136,7 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, SDL_Rect viewport
             }
         }
     }
-
-    // Dessiner la pièce de stocker si elle existe
+  // Dessiner la pièce de stocker si elle existe
     if (state->stock_piece.type != -1) {
         Tetromino* stock_piece = &state->stock_piece;
         for (int i = 0; i < 4; i++) {
@@ -147,5 +160,36 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, SDL_Rect viewport
             }
         }
     }
+  
+    char buffer[64];
+    SDL_Color white = {255, 255, 255, 255};
+
+    int separator_x = GRID_WIDTH * BLOCK_SIZE;  // à droite de la grille
+
+    int text_x = separator_x + 20;  // 20px droite de la ligne verticale
+
+    // texte
+    sprintf(buffer, "Score: %d", state->score);
+    render_text(renderer, buffer, text_x, 50, white, font);
     
+    sprintf(buffer, "Niveau: %d", state->level);
+    render_text(renderer, buffer, text_x, 100, white, font);
+    
+    sprintf(buffer, "Lignes: %d", state->lines_cleared);
+    render_text(renderer, buffer, text_x, 150, white, font);
+    
+
+    //ligne verticale fine (1 pixel)
+    SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+    SDL_RenderDrawLine(renderer, separator_x, 0, separator_x, SCREEN_HEIGHT);
+    
+    //zone d'info
+    SDL_Rect info_area = {separator_x + 1, 0, SCREEN_WIDTH - (separator_x + 1), SCREEN_HEIGHT};
+    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
+    SDL_RenderFillRect(renderer, &info_area);
+    
+    SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+    SDL_RenderDrawLine(renderer, separator_x, 0, separator_x, SCREEN_HEIGHT);
+    
+    SDL_RenderPresent(renderer);
 }

@@ -110,7 +110,7 @@ bool check_collision(GameState* state, Tetromino* piece) {
 
 void move_tetromino(GameState* state, int nx, int ny) {
     // Vérifier si le déplacement ne génère pas de collision
-    
+
     Tetromino copy_temp;
     copy_temp.x = state->current_piece.x + nx;
     copy_temp.y = state->current_piece.y + ny;

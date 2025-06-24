@@ -32,6 +32,7 @@ void init_game(GameState* state){
     new_random_tetromino(&state->current_piece, &state->next_piece);
 }
 
+
 int update_game(GameState* state) {
 
     Tetromino piece = {state->current_piece.x, state->current_piece.y + 1, state->current_piece.type, state->current_piece.rotation};
@@ -72,6 +73,7 @@ int place_piece(GameState* state, Tetromino* tetromino) {
         }
     }
     
+
     new_random_tetromino(tetromino, &state->next_piece);
     state->last_drop_time = SDL_GetTicks();
     state->has_already_stock = false;
