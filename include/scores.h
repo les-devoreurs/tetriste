@@ -22,4 +22,5 @@ void display_game_over_scores(SDL_Renderer* renderer, TTF_Font* font, const char
     const char* player_name, int player_score);
 int find_player_rank(ScoreEntry* scores, int count, int player_score);
 void get_player_name(char* name, int max_length);
+void display_duel_result(SDL_Renderer* renderer, TTF_Font* font, bool player_won);
 #endif

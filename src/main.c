@@ -146,13 +146,15 @@ int main(int argc, char** argv) {
                 display_game_over_scores(renderer, font, score_file, 
                                     player_name, statePlayer.score);
                                     
-            } else if (selected_option == 1) { // Mode duel
-                if (statePlayer.game_over) {
-                    printf("Game Over! You lose against the bot!\n");
-                } else if (stateBot.game_over) {
-                    printf("Win! You win against the bot!\n");
-                }
+            } if (statePlayer.game_over) {
+                display_duel_result(renderer, font, false);  // joueur a perdu
+                save_score(score_file, player_name, statePlayer.score);
+            } else if (stateBot.game_over) {
+                display_duel_result(renderer, font, true);   // joueur a gagné
+                int final_score = statePlayer.score + 500; // bonus victoire
+                save_score(score_file, player_name, final_score);
             }
+            
         }
     }
     SDL_DestroyRenderer(renderer);

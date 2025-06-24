@@ -8,11 +8,36 @@
 
 
 void save_score(const char* filename, const char* name, int score) {
-    FILE* f = fopen(filename, "a");
-    if (f == NULL) return;
-    fprintf(f, "%s %d\n", name, score);
+    ScoreEntry scores[MAX_SCORES];
+    int count = load_scores(filename, scores, MAX_SCORES);
+
+    bool updated = false;
+    for (int i = 0; i < count; i++) {
+        if (strcmp(scores[i].name, name) == 0) {
+            if (score > scores[i].score) {
+                scores[i].score = score;  // mise à jour si score meilleur
+            }
+            updated = true;
+            break;
+        }
+    }
+
+    // Si le nom n'existait pas, on l'ajoute
+    if (!updated && count < MAX_SCORES) {
+        strcpy(scores[count].name, name);
+        scores[count].score = score;
+        count++;
+    }
+
+    // Réécrire tout le fichier
+    FILE* f = fopen(filename, "w");
+    if (!f) return;
+    for (int i = 0; i < count; i++) {
+        fprintf(f, "%s %d\n", scores[i].name, scores[i].score);
+    }
     fclose(f);
 }
+
 
 int load_scores(const char* filename, ScoreEntry* scores, int max) {
     FILE* f = fopen(filename, "r");
@@ -42,12 +67,12 @@ void display_scores(SDL_Renderer* renderer, TTF_Font* font, ScoreEntry* scores, 
     SDL_RenderClear(renderer);
 
     SDL_Color white = {255, 255, 255, 255};
-    render_text(renderer, "Tableau des Scores", 180, 50, white, font);
+    render_text(renderer, "Tableau des Scores", 100, 50, white, font);
 
     char buffer[64];
     for (int i = 0; i < count; i++) {
         snprintf(buffer, sizeof(buffer), "%d. %s - %d", i+1, scores[i].name, scores[i].score);
-        render_text(renderer, buffer, 200, 100 + i * 30, white, font);
+        render_text(renderer, buffer, 100, 100 + i * 30, white, font);
     }
 
     SDL_RenderPresent(renderer);
@@ -173,7 +198,7 @@ void display_game_over_scores(SDL_Renderer* renderer, TTF_Font* font, const char
         render_text(renderer, buffer, 50, 170 + i * 25, color, font);
     }
     
-    render_text(renderer, "Entrée pour continuer", 40, 450, white, font);
+    render_text(renderer, "Espace pour continuer", 40, 450, white, font);
     
     SDL_RenderPresent(renderer);
     
@@ -193,3 +218,33 @@ void display_game_over_scores(SDL_Renderer* renderer, TTF_Font* font, const char
         SDL_Delay(16);
     }
 }
+
+void display_duel_result(SDL_Renderer* renderer, TTF_Font* font, bool player_won) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_Color color = player_won ? (SDL_Color){0, 255, 0, 255} : (SDL_Color){255, 0, 0, 255};
+    const char* message = player_won ? "Vous avez GAGNE !" : "Vous avez PERDU !";
+
+    render_text(renderer, "Resultat du Duel", 100, 100, (SDL_Color){255, 255, 255, 255}, font);
+    render_text(renderer, message, 120, 180, color, font);
+    render_text(renderer, "Espace pour continuer", 60, 300, (SDL_Color){255, 255, 255, 255}, font);
+
+    SDL_RenderPresent(renderer);
+
+    SDL_Event event;
+    bool wait = true;
+    while (wait) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                wait = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_SPACE) {
+                    wait = false;
+                }
+            }
+        }
+        SDL_Delay(16);
+    }
+}
+
