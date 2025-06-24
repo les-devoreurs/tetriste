@@ -64,3 +64,134 @@ void display_scores(SDL_Renderer* renderer, TTF_Font* font, ScoreEntry* scores, 
         }
     }
 }
+    int find_player_rank(ScoreEntry* scores, int count, int player_score) {
+        for (int i = 0; i < count; i++) {
+            if (scores[i].score == player_score) {
+                return i + 1; 
+            }
+        }
+        return -1; 
+    }
+
+void get_player_name(char* name, int max_length) {
+    printf("Entrez votre nom (max %d caractères): ", max_length - 1);
+    if (fgets(name, max_length, stdin)) {
+        //retour chariot
+        name[strcspn(name, "\n")] = 0;
+        
+        //nom par défaut Joueur
+        if (strlen(name) == 0) {
+            strcpy(name, "Joueur");
+        }
+        
+        //clean
+        int len = strlen(name);
+        while (len > 0 && isspace(name[len-1])) {
+            name[--len] = 0;
+        }
+        
+        if (len == 0) {
+            strcpy(name, "Joueur");
+        }
+    } else {
+        strcpy(name, "Joueur");
+    }
+}
+
+void display_game_over_scores(SDL_Renderer* renderer, TTF_Font* font, const char* filename, 
+                             const char* player_name, int player_score, int game_mode) {
+    
+    ScoreEntry scores[MAX_SCORES];
+    int count = load_scores(filename, scores, MAX_SCORES);
+    
+    // Ajouter le score du joueur actuel temporairement pour le classement
+    ScoreEntry temp_scores[MAX_SCORES + 1];
+    for (int i = 0; i < count; i++) {
+        temp_scores[i] = scores[i];
+    }
+    
+    //vérifier si le score du joueur est déjà présent (évite les doublons)
+    bool already_present = false;
+    for (int i = 0; i < count; i++) {
+        if (strcmp(scores[i].name, player_name) == 0 && scores[i].score == player_score) {
+            already_present = true;
+            break;
+        }
+    }
+
+    if (!already_present) {
+        strcpy(temp_scores[count].name, player_name);
+        temp_scores[count].score = player_score;
+        count++;
+    }
+
+    
+    sort_scores(temp_scores, count);
+    
+    // Trouver le rang du joueur
+    int player_rank = find_player_rank(temp_scores, count, player_score);
+    
+    // Effacer l'écran
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    
+    SDL_Color white = {255, 255, 255, 255};
+    SDL_Color yellow = {255, 255, 0, 255};
+    SDL_Color red = {255, 100, 100, 255};
+    
+    const char* title = (game_mode == 0) ? "GAME OVER - Mode Classique" : 
+                       (game_mode == 1) ? "GAME OVER - Mode Duel" : "GAME OVER";
+    render_text(renderer, title, 30, 30, red, font);
+    
+    // Score du joueur
+    char player_info[128];
+    if (player_rank <= 10) {
+        snprintf(player_info, sizeof(player_info), "Votre score: %d (Rang #%d)", player_score, player_rank);
+        render_text(renderer, player_info, 30, 70, yellow, font);
+        render_text(renderer, "Bravo TOP 10!", 70, 100, yellow, font);
+    } else {
+        snprintf(player_info, sizeof(player_info), "Votre score: %d (Rang #%d)", player_score, player_rank);
+        render_text(renderer, player_info, 30, 70, white, font);
+    }
+    
+    // Titre du tableau
+    render_text(renderer, "TOP 10", 30, 140, white, font);
+    
+    // Afficher le top 10
+    char buffer[64];
+    for (int i = 0; i < count && i < 10; i++) {
+        SDL_Color color = white;
+        
+        // Mettre en surbrillance le score du joueur actuel s'il est dans le top 10
+        if (strcmp(temp_scores[i].name, player_name) == 0 && 
+            temp_scores[i].score == player_score) {
+            color = yellow;
+            snprintf(buffer, sizeof(buffer), "%d. %s - %d <<<", i+1, temp_scores[i].name, temp_scores[i].score);
+        } else {
+            snprintf(buffer, sizeof(buffer), "%d. %s - %d", i+1, temp_scores[i].name, temp_scores[i].score);
+        }
+        
+        render_text(renderer, buffer, 50, 170 + i * 25, color, font);
+    }
+    
+    render_text(renderer, "Entrée pour continuer", 40, 450, white, font);
+    
+    SDL_RenderPresent(renderer);
+    
+    // Attendre l'input du joueur
+    SDL_Event event;
+    bool wait = true;
+    while (wait) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                wait = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RETURN || 
+                    event.key.keysym.sym == SDLK_ESCAPE) {
+                    wait = false;
+                }
+            }
+        }
+        SDL_Delay(16);
+    }
+}
