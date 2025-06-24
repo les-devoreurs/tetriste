@@ -18,7 +18,7 @@ void render_menu(SDL_Renderer* renderer, TTF_Font* font, int selected_item) {
         int text_height = surface->h;
         SDL_FreeSurface(surface);
 
-        SDL_Rect dest_rect = {300 - text_width / 2, 200 + i * 50, text_width, text_height};
+        SDL_Rect dest_rect = {225 - text_width / 2, 200 + i * 50, text_width, text_height};
         SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
         SDL_DestroyTexture(texture);
     }

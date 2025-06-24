@@ -31,87 +31,59 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-  /*
-    SDL_Window* window = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 600, SDL_WINDOW_SHOWN);
-    if (!window) {
-        SDL_Quit();
-        return 1;
-    }
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (!renderer) {
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 1;
-    }
-    */
-
     bool global_quit = false;
-
-    int gamemode = 0; // 0: pour le mode solo 1: pour le mode vs bot
-
+    
     // Initialisation du générateur de nombres aléatoires
     srand(time(NULL));
 
-    // Initialiser l'état du jeu
+    // Initialiser le visuel du jeu
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
-    int screen_width = init_renderer(&window, &renderer, gamemode);
-
-    GameState statePlayer;
-    init_game(&statePlayer);
-    SDL_Rect viewport_player = {0, 0,  screen_width, SCREEN_HEIGHT};
-    int lines_cleared_player = 0;
-    if (gamemode == 1)
-    {
-        viewport_player = (SDL_Rect) {0, 0,  screen_width/2, SCREEN_HEIGHT};
-    }
-
-    GameState stateBot;
-    SDL_Rect viewport_bot;
-    int lines_cleared_bot = 0;
-    if (gamemode == 1) {
-        init_game(&stateBot);
-        stateBot.drop_speed = 300;
-        viewport_bot = (SDL_Rect) {screen_width/2, 0,  screen_width/2, SCREEN_HEIGHT};
-    }
+    int screen_width = init_renderer(&window, &renderer);
 
     while (!global_quit) {
-        int selected_option = menu(window, renderer);
+        // resize to menu window
+        screen_width = resize_window(window ,0);
+        
+        int selected_option = menu(window, renderer); // 0 : Le mode solo, 1 : Le mode vs bot
         if (selected_option < 0 || selected_option == 3) { // Quitter
             global_quit = true;
             break;
         }
-
-    // à revoir
-        if (selected_option == 2) {
+        // à revoir
+        else if (selected_option == 2) {
             ScoreEntry scores[MAX_SCORES];
             int count = load_scores("src/scores.txt", scores, MAX_SCORES);
             sort_scores(scores, count);
             display_scores(renderer, font, scores, count);
             continue;
         }
-      // à revoir
+        // à revoir
         
-        //GameState state;
-        //init_game(&state);
+        // resize window
+        screen_width = resize_window(window ,selected_option);
 
-        //bool quit_game = false;
+        GameState statePlayer;
+        init_game(&statePlayer);
+        SDL_Rect viewport_player = {0, 0,  screen_width, SCREEN_HEIGHT};
+        int lines_cleared_player = 0;
+        if (selected_option == 1)
+        {
+            viewport_player = (SDL_Rect) {0, 0,  screen_width/2, SCREEN_HEIGHT};
+        }
+
+        GameState stateBot;
+        SDL_Rect viewport_bot;
+        int lines_cleared_bot = 0;
+        if (selected_option == 1) {
+            init_game(&stateBot);
+            stateBot.drop_speed = 300;
+            viewport_bot = (SDL_Rect) {screen_width/2, 0,  screen_width/2, SCREEN_HEIGHT};
+        }
+
         bool return_to_menu = false;
         SDL_Event event;
-
-      /*
-        if (state.game_over) {
-            char name[MAX_NAME_LENGTH] = "Joueur"; //score mais pas encore implémenter
-            save_score("src/scores.txt", name, state.score);
-            SDL_Delay(2000);
-            
-        }*/
-
-        //revenir au menu si le bool return_to_menu true, sinon on boucle (ou quitte)
-
-    Tetromino best_move = {3, 3, 3, 3};
-    
+        Tetromino best_move = {3, 3, 3, 3};
         while (!global_quit && !statePlayer.game_over && !stateBot.game_over && !return_to_menu) {
             handle_input(&event, &global_quit, &statePlayer, &return_to_menu); // Gestion des entrées clavier
             
@@ -119,7 +91,7 @@ int main(int argc, char** argv) {
             if (now_player - statePlayer.last_drop_time > statePlayer.drop_speed) {
                 int temp_lines_cleared_player = update_game(&statePlayer);  // Mise à jour de l'état du jeu
 
-                if(gamemode == 1 &&  temp_lines_cleared_player != -1) {
+                if(selected_option == 1 &&  temp_lines_cleared_player != -1) {
                     lines_cleared_player += temp_lines_cleared_player;
                     add_garbage_lines(&statePlayer, lines_cleared_bot);     // Ajoute une ligne dans la grille pour chaque ligne finit par le bot
                     lines_cleared_bot = 0;
@@ -127,7 +99,7 @@ int main(int argc, char** argv) {
                 statePlayer.last_drop_time = now_player;
             }
             
-            if (gamemode == 1) {
+            if (selected_option == 1) {
                 Uint32 now_bot = SDL_GetTicks();
                 if (now_bot - stateBot.last_drop_time > stateBot.drop_speed) {
                     best_move = find_best_move(&stateBot);
@@ -146,7 +118,7 @@ int main(int argc, char** argv) {
             
             SDL_RenderClear(renderer);
             draw_on_renderer(renderer, &statePlayer, font, viewport_player);  // Rendu graphique joueur
-            if (gamemode == 1)
+            if (selected_option == 1)
             {
                 draw_on_renderer(renderer, &stateBot, font, viewport_bot);        // Rendu graphique bot
             }
@@ -157,17 +129,28 @@ int main(int argc, char** argv) {
         }
 
         // Game Over
-        if (gamemode == 1 && statePlayer.game_over) {
+        if (selected_option == 1 && statePlayer.game_over) {
             printf("Game Over! You lose against the bot!\n");
             SDL_Delay(2000); // Attente avant de quitter
         }
-        else if (gamemode == 1 && stateBot.game_over) {
+        else if (selected_option == 1 && stateBot.game_over) {
             printf("Win! You win against the bot!\n");
             SDL_Delay(2000); // Attente avant de quitter
         }
-        else if (gamemode == 0) {
+        else if (selected_option == 0) {
             printf("Game Over! Score:%u\n", statePlayer.score);
         }
+
+        /*
+        if (state.game_over) {
+            char name[MAX_NAME_LENGTH] = "Joueur"; //score mais pas encore implémenter
+            save_score("src/scores.txt", name, state.score);
+            SDL_Delay(2000);
+            
+        }*/
+
+        //revenir au menu si le bool return_to_menu true, sinon on boucle (ou quitte)
+
     }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

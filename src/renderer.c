@@ -35,15 +35,9 @@ void render_text(SDL_Renderer* renderer, const char* text, int x, int y, SDL_Col
     SDL_DestroyTexture(texture);
 }
 
-
-int init_renderer(SDL_Window** window, SDL_Renderer** renderer, int gamemode)
+int init_renderer(SDL_Window** window, SDL_Renderer** renderer)
 {
-    float modifier = 1.5;
-    if (gamemode == 1) {
-        modifier = 3;
-    }
-
-    *window = SDL_CreateWindow("Tetriste", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * modifier, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    *window = SDL_CreateWindow("Tetriste", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * 1.5, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     
     if (!*window){
         printf("Erreur création fenêtre : %s\n", SDL_GetError());
@@ -59,7 +53,7 @@ int init_renderer(SDL_Window** window, SDL_Renderer** renderer, int gamemode)
 
     temp_renderer = *renderer; 
 
-    return SCREEN_WIDTH * modifier;
+    return SCREEN_WIDTH * 1.5;
 }
 
 void clean_renderer(SDL_Window* window, SDL_Renderer* renderer){
@@ -71,7 +65,7 @@ void clean_renderer(SDL_Window* window, SDL_Renderer* renderer){
 
 void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, SDL_Rect viewport){
     SDL_RenderSetViewport(renderer, &viewport);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
+    //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //fond noir
 
     Tetromino* current_piece = &state->current_piece;
 
@@ -114,7 +108,7 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, S
             }
         }
     }
-  Tetromino* next_piece = &state->next_piece;
+    Tetromino* next_piece = &state->next_piece;
     // Dessiner la pièce suivante
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -136,7 +130,8 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, S
             }
         }
     }
-  // Dessiner la pièce de stocker si elle existe
+    
+    // Dessiner la pièce de stocker si elle existe
     if (state->stock_piece.type != -1) {
         Tetromino* stock_piece = &state->stock_piece;
         for (int i = 0; i < 4; i++) {
@@ -177,8 +172,8 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, S
     
     sprintf(buffer, "Lignes: %d", state->lines_cleared);
     render_text(renderer, buffer, text_x, 150, white, font);
-    
 
+    /*
     //ligne verticale fine (1 pixel)
     SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
     SDL_RenderDrawLine(renderer, separator_x, 0, separator_x, SCREEN_HEIGHT);
@@ -191,5 +186,16 @@ void draw_on_renderer(SDL_Renderer* renderer,GameState* state, TTF_Font* font, S
     SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
     SDL_RenderDrawLine(renderer, separator_x, 0, separator_x, SCREEN_HEIGHT);
     
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(renderer);*/
+}
+
+int resize_window(SDL_Window* window, int gamemode) {
+    float modifier = 1.5;
+    if (gamemode == 1) {
+        modifier = 3;
+    }
+
+    SDL_SetWindowSize(window,SCREEN_WIDTH * modifier, SCREEN_HEIGHT);
+    
+    return SCREEN_WIDTH * modifier;
 }
