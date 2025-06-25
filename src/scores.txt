@@ -1,0 +1,10 @@
+Alice 1500
+Bob 1200
+Charlie 1000
+mina 100
+mina 100
+ertyu 0
+etet 0
+etet 0
+etet 0
+etet 0
